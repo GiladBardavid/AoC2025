@@ -1,5 +1,5 @@
 /**
-* Day 4 task 1
+* Day 4 task 2
 * @author Gilad B.
  */
 
