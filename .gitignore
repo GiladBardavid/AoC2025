@@ -1,3 +1,7 @@
+.idea/
+/in.txt
+/tmp.txt
+
 # Prerequisites
 *.d
 
