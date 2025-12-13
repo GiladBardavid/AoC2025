@@ -26,7 +26,7 @@ int solve_row(string s) {
      * Then for the smallest one we need to loop from right to left and take greedily while every time we pass a larger
      * digit we keep track of that then insert the small digit into the right position in the resulting integer.
      */
-    / digit_to_occurrences_in_largest[10] = {0};
+    int digit_to_occurrences_in_largest[10] = {0};
     int smallest_included_digit = 9;
     int included_digits = 0;
     for (int i = 9; i >= 0; i--) {
