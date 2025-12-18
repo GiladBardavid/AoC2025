@@ -16,13 +16,18 @@ using namespace std;
 #define rep(i, a, b) for(int i = a; i < (b); ++i)
 #define pb push_back
 #define vi vector<int>
+#define pii pair<int, int>
 
 map<int, vector<int>> idx_to_point;
 
 struct {
-    bool operator()(pair<vector<int>, vector<int>> a, pair<vector<int>, vector<int>> b) const {
-        float dist_a = pow(a.first[0] - a.second[0], 2) + pow(a.first[1] - a.second[1], 2) + pow(a.first[2] - a.second[2], 2);
-        float dist_b = pow(b.first[0] - b.second[0], 2) + pow(b.first[1] - b.second[1], 2) + pow(b.first[2] - b.second[2], 2);
+    bool operator()(pii a, pii b) const {
+        vi ax = idx_to_point[a.first];
+        vi ay = idx_to_point[a.second];
+        vi bx = idx_to_point[b.first];
+        vi by = idx_to_point[b.second];
+        float dist_a = pow(ax[0] - ay[0], 2) + pow(ax[1] - ay[1], 2) + pow(ax[2] - ay[2], 2);
+        float dist_b = pow(bx[0] - by[0], 2) + pow(bx[1] - by[1], 2) + pow(bx[2] - by[2], 2);
         return dist_a < dist_b;
     }
 } comp;
@@ -41,11 +46,11 @@ vector<vector<int>> get_input() {
     return res;
 }
 
-vector<pair<vector<int>, vector<int>>> get_all_pairs_sorted(vector<vector<int>> a) {
-    vector<pair<vector<int>, vector<int>>> res;
+vector<pii> get_all_pairs_sorted(vector<vector<int>> a) {
+    vector<pii> res;
     for (int i = 0; i < a.size(); i++) {
         for (int j = i + 1; j < a.size(); j++) {
-            res.push_back({a[i], a[j]});
+            res.push_back({i, j});
         }
     }
     sort(res.begin(), res.end(), comp);
@@ -58,15 +63,68 @@ void initialize_idx_to_point_map(vector<vector<int>> a) {
     }
 }
 
+int n;
+vector<vector<int>> adj;
+vector<bool> used;
+vector<int> component;
+
+void dfs(int v) {
+    stack<int> st;
+    st.push(v);
+
+    while (!st.empty()) {
+        int curr = st.top();
+        st.pop();
+        if (!used[curr]) {
+            used[curr] = true;
+            component.push_back(curr);
+            for (int i = adj[curr].size() - 1; i >= 0; i--) {
+                st.push(adj[curr][i]);
+            }
+        }
+    }
+}
+
+vi find_comps() {
+    // Returns the lengths of the components
+    vi res;
+    fill(used.begin(), used.end(), 0);
+    for (int v = 0; v < n ; ++v) {
+        if (!used[v]) {
+            component.clear();
+            dfs(v);
+            res.push_back(component.size());
+        }
+    }
+    return res;
+}
+
 void solve() {
     vector<vector<int>> a = get_input();
-    initialize_idx_to_point_map();
-    vector<pair<vector<int>, vector<int>>> pairs_sorted = get_all_pairs_sorted(a);
-    vector<vector<int>>
+    n = a.size();
+    adj.assign(n, {});
+    used.assign(n, false);
 
-    for (auto p : pairs_sorted) {
-        cout << p.first[0] << " " << p.first[1] << " " << p.first[2] << " " << p.second[0] << " " << p.second[1] << " " << p.second[2] << endl;
+    initialize_idx_to_point_map(a);
+    vector<pii> pairs_sorted = get_all_pairs_sorted(a);
+
+    int edges_to_edd = 1000;
+    for (int i = 0; i < edges_to_edd; i++) {
+        int x, y;
+        tie(x, y) = pairs_sorted[i];
+        adj[x].push_back(y);
+        adj[y].push_back(x);
     }
+
+    vi comp_lengths = find_comps();
+    sort(comp_lengths.begin(), comp_lengths.end(), greater<int>());
+
+    int to_mult = 3;
+    int res = 1;
+    for (int i = 0; i < to_mult; i++) {
+        res *= comp_lengths[i];
+    }
+    cout << res << endl;
 }
 
 
